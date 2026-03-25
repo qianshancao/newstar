@@ -6,8 +6,19 @@
 
 通过 `PostToolUse` Hook 监听 `Write` 和 `Edit` 工具调用，当被修改的文件是 `.py` 文件时，自动执行：
 
-1. `poetry run ruff format <file>` — 格式化代码
-2. `poetry run ruff check --fix <file>` — 检查并自动修复 lint 问题
+1. `ruff format <file>` — 格式化代码
+2. `ruff check --fix <file>` — 检查并自动修复 lint 问题
+3. `ruff check <file>` — 检查是否还有残留问题，有则反馈给 Claude 自动处理
+
+完整的判断链：
+
+```
+文件后缀 != "py"        → 静默跳过
+ruff 未安装              → 提示安装，Claude 自动处理
+没有 pyproject.toml      → 提示创建，Claude 自动处理
+ruff format + check --fix → 静默修复
+还有残留问题             → 反馈给 Claude 自动修复
+```
 
 ## 安装
 
@@ -18,9 +29,5 @@
 
 ## 前置要求
 
-- 项目使用 [Poetry](https://python-poetry.org/) 管理
-- 项目依赖中包含 [ruff](https://docs.astral.sh/ruff/)
-
-## 配置
-
-默认直接使用 `poetry run ruff`，如需自定义 ruff 路径，编辑 `hooks/hooks.json` 中的 command 字段。
+- 全局安装 [ruff](https://docs.astral.sh/ruff/)（`pip install ruff`）
+- 项目根目录需要 `pyproject.toml`
